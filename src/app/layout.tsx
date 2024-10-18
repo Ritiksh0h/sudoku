@@ -62,15 +62,13 @@ export const metadata: Metadata = {
     images: [siteConfig.ogImage],
     creator: `@${siteConfig.creator.name.replace(" ", "").toLowerCase()}`,
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-  },
   robots: {
     index: true,
     follow: true,
   },
 };
+
+
 export default function RootLayout({
   children,
 }: Readonly<{
