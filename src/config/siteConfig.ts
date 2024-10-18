@@ -1,9 +1,9 @@
 export const siteConfig = {
   name: "Sudoku Challenge",
   title: "Interactive Sudoku Game",
-  url: `${process.env.NEXT_PUBLIC_APP_URL}`,
-  ogImage: `${process.env.NEXT_PUBLIC_APP_URL}/sudoku-og.png`,
-  ogImageSmall: `${process.env.NEXT_PUBLIC_APP_URL}/sudoku-og-small.png`,
+  url: `https://sudoku_ritikshah.vercel.app`,
+  ogImage: `https://sudoku_ritikshah.vercel.app/sudoku-og.png`,
+  ogImageSmall: `https://sudoku_ritikshah.vercel.app/sudoku-og-small.png`,
   description:
     "Play interactive Sudoku puzzles of varying difficulty. Test your logical thinking and number placement skills.",
   creator: {
@@ -18,8 +18,8 @@ export const siteConfig = {
     "Daily challenges",
   ],
   links: {
-    github: "https://github.com/yourusername/sudoku",
-    issues: "https://github.com/yourusername/sudoku/issues",
+    github: "https://github.com/Ritiksh0h/sudoku",
+    issues: "https://github.com/Ritiksh0h/sudoku/issues",
     portfolio: "https://ritikshah.vercel.app",
   },
 };
