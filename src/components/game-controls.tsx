@@ -39,7 +39,7 @@ GameControlsProps) {
   };
 
   return (
-    <div className="mt-2 flex justify-between bg-muted items-center rounded-lg py-2 px-4">
+    <div className="mt-4 flex justify-between bg-muted items-center rounded-lg py-2 px-4">
       <div className="flex justify-between items-center gap-4">
         <Button
           variant="outline"

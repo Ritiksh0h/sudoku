@@ -1,3 +1,4 @@
+// game-end.tsx
 import { motion } from "framer-motion";
 import { Trophy, XCircle, Clock, BarChart2 } from "lucide-react";
 import {
@@ -7,13 +8,23 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Difficulty } from "@/lib/sudoku";
+import { useState } from "react";
 
 interface GameDialogProps {
   gameStatus: "won" | "lost" | "playing";
   time: number;
   difficulty: string;
   onNewGame: () => void;
+  onChangeDifficulty: (difficulty: Difficulty) => void;
 }
 
 const formatTime = (time: number) => {
@@ -28,9 +39,16 @@ export default function GameEndDialog({
   gameStatus,
   time,
   difficulty,
+  onChangeDifficulty,
   onNewGame,
 }: GameDialogProps) {
+  // State to manage selected difficulty
+  const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>(
+    difficulty as Difficulty
+  );
+
   const handleNewGame = () => {
+    onChangeDifficulty(selectedDifficulty); // Change difficulty before starting a new game
     onNewGame();
   };
 
@@ -71,11 +89,29 @@ export default function GameEndDialog({
             </div>
           </div>
         </motion.div>
-        <DialogFooter>
-          <Button
-            onClick={handleNewGame}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground transition-colors"
-          >
+        <Select
+          value={selectedDifficulty}
+          onValueChange={(value) =>
+            setSelectedDifficulty(value as Difficulty)
+          } // Update state when difficulty changes
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select difficulty" />
+          </SelectTrigger>
+          <SelectContent>
+            {["easy", "medium", "hard", "expert"].map((diff, i) => (
+              <SelectItem
+                key={i}
+                value={diff}
+                className="capitalize"
+              >
+                {diff}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <DialogFooter className="">
+          <Button onClick={handleNewGame} className="w-full">
             New Game
           </Button>
         </DialogFooter>

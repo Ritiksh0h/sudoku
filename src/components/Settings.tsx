@@ -204,7 +204,7 @@ export function SettingsDialog({
       <DialogTrigger>
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger asChild>
               <>
                 <Settings className="cursor-pointer" size={24} />
                 <span className="sr-only">Open settings</span>

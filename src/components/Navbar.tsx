@@ -1,31 +1,45 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Menu,
   ChevronRight,
   PencilLine,
   RotateCcw,
   X,
+  CirclePlus,
 } from "lucide-react";
 import { Settings, SettingsDialog } from "./Settings";
 import ShareSudokuDialog from "./share-dialog";
-
-type Difficulty = "easy" | "medium" | "hard" | "expert";
+import { Difficulty, SudokuData } from "@/lib/sudoku";
+import { sudokuToCompactString } from "@/lib/sudokuEncoder";
 
 interface NavbarProps {
   difficulty: Difficulty;
   onChangeDifficulty: (difficulty: Difficulty) => void;
   onNewGame: () => void;
+  onRestartGame: () => void;
   settings: Settings;
   onSettingsChange: (newSettings: Settings) => void;
   mistakes: number;
+  onCodeEntered: (code: string) => void;
+  sudokuData: SudokuData;
 }
 
 export function Navbar({
@@ -35,17 +49,22 @@ export function Navbar({
   settings,
   onSettingsChange,
   difficulty,
+  onRestartGame,
+  onCodeEntered,
+  sudokuData,
 }: NavbarProps) {
+  const [menuOpen, setMenuOpen] = React.useState(false);
+
+  const shareCode = sudokuToCompactString(sudokuData);
+
   return (
     <div className="flex justify-between items-center mb-4 px-4 py-2 bg-muted rounded-lg">
       <div className="flex justify-between items-center gap-4">
-        <DropdownMenu>
+        <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
           <DropdownMenuTrigger asChild>
             <Menu size={24} className="cursor-pointer" />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuLabel>New game</DropdownMenuLabel>
-            <DropdownMenuSeparator />
             {["easy", "medium", "hard", "expert"].map((diff, i) => (
               <DropdownMenuItem
                 key={i}
@@ -56,11 +75,20 @@ export function Navbar({
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={onNewGame}>
+            <DropdownMenuItem onSelect={onRestartGame}>
               <RotateCcw className="mr-1" /> Restart game
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <PencilLine className="mr-1" /> Enter code
+            <DropdownMenuItem onSelect={onNewGame}>
+              <CirclePlus className="mr-1" /> New game
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
+              <EnterCodeDialog
+                onCodeEntered={(code) => {
+                  onCodeEntered(code);
+                  setMenuOpen(false);
+                }}
+              />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -79,12 +107,62 @@ export function Navbar({
         </span>
       </div>
       <div className="flex justify-between items-center gap-4">
-        <ShareSudokuDialog shareCode="" />
+        <ShareSudokuDialog shareCode={shareCode} />
         <SettingsDialog
           settings={settings}
           onSettingsChange={onSettingsChange}
         />
       </div>
     </div>
+  );
+}
+
+interface EnterCodeDialogProps {
+  onCodeEntered: (code: string) => void;
+}
+
+export function EnterCodeDialog({ onCodeEntered }: EnterCodeDialogProps) {
+  const [code, setCode] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const handleSubmit = () => {
+    onCodeEntered(code);
+    setOpen(false);
+    setCode("");
+  };
+
+  return (
+    <>
+      <Button
+        variant="ghost"
+        className="p-0 h-auto"
+        onClick={() => setOpen(true)}
+      >
+        <PencilLine className="mr-1" /> Enter code
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Enter Sudoku Code</DialogTitle>
+            <DialogDescription>
+              Enter a valid Sudoku code to load a specific puzzle.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <Input
+              id="code"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="Enter Sudoku code"
+            />
+          </div>
+          <DialogFooter>
+            <Button type="submit" onClick={handleSubmit}>
+              Load Puzzle
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

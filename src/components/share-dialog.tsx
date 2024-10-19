@@ -67,7 +67,7 @@ export default function ShareSudokuDialog({
         return;
       case "email":
         url = `mailto:?subject=Check%20out%20this%20Sudoku%20puzzle!&body=${encodeURIComponent(
-          shareCode
+          "Sudoku code: " + shareCode
         )}`;
         break;
       default:
@@ -81,7 +81,7 @@ export default function ShareSudokuDialog({
       <DialogTrigger>
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger asChild>
               <>
                 <Share2 className="cursor-pointer" size={24} />
                 <span className="sr-only">Share Sudoku</span>
