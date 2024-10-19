@@ -1,7 +1,7 @@
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Brain, Trophy, Smartphone } from "lucide-react";
+import { Brain, Trophy, Smartphone, Info } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -19,18 +19,18 @@ export default function SudokuChallenge() {
           </p>
         </header>
 
-        <main>
-          <section className="mb-16">
+        <main className="space-y-8">
+          <section className="">
             <div className="flex justify-between gap-8 items-center">
               <div>
                 <h2 className="text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-6">
                   Ready to Play?
                 </h2>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                <p className="text-muted-foreground mb-4">
                   Dive into a world of logical thinking and number mastery. Our
                   Sudoku game offers:
                 </p>
-                <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 mb-6">
+                <ul className="list-disc list-inside text-muted-foreground mb-6">
                   <li>
                     Multiple difficulty levels: Easy, Medium, Hard, and Expert
                   </li>
@@ -60,7 +60,7 @@ export default function SudokuChallenge() {
             </div>
           </section>
 
-          <section className="mb-16">
+          <section className="">
             <h2 className="text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-6">
               Game Features
             </h2>
@@ -83,15 +83,47 @@ export default function SudokuChallenge() {
             </div>
           </section>
 
-          <section className="mb-16">
+          <section className="space-y-6">
+            <h2 className="text-3xl font-semibold text-gray-800 dark:text-gray-200">
+              How to Play Sudoku
+            </h2>
+            <ol className="list-decimal list-inside space-y-2 text-muted-foreground">
+              <li>
+                The goal is to fill a 9×9 grid with numbers so that each column,
+                row, and 3×3 section contain all digits from 1 to 9.
+              </li>
+              <li>
+                Start with the given numbers and use logic to deduce where the
+                missing numbers should be placed.
+              </li>
+              <li>
+                Remember, no number can appear twice in the same row, column, or
+                3×3 box.
+              </li>
+              <li>
+                Use the process of elimination and look for patterns to solve
+                the puzzle.
+              </li>
+              <li>
+                Don&apos;t guess! Sudoku is a game of logic and reasoning.
+              </li>
+            </ol>
+            <Button variant="outline" className="my-2" asChild>
+              <Link href="/tutorial">
+                <Info className="mr-2 h-5 w-5" /> Full Tutorial
+              </Link>
+            </Button>
+          </section>
+
+          <section className="">
             <h2 className="text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-6">
               Why Play Sudoku?
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
+            <p className="text-muted-foreground mb-4">
               Sudoku isn&apos;t just fun - it&apos;s a workout for your brain!
               Regular play can improve:
             </p>
-            <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 mb-6">
+            <ul className="list-disc list-inside text-muted-foreground mb-6">
               <li>Concentration and focus</li>
               <li>Logical thinking skills</li>
               <li>Memory and cognitive function</li>
@@ -101,13 +133,22 @@ export default function SudokuChallenge() {
 
           <section className="text-center">
             <h2 className="text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-              Join Our Sudoku Community
+              Join Sudoku Community
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
+            <p className="text-muted-foreground mb-6">
               Connect with fellow puzzle enthusiasts, share strategies, and
               compete on our leaderboards!
             </p>
-            <Button size="lg">Sign Up Free</Button>
+            <Button size="lg">
+              <Link
+                href={
+                  "http://forum.enjoysudoku.com/ucp.php?mode=register&sid=52c22a7eee2909d87ab4c3f6ea5bba10"
+                }
+                target="_blank"
+              >
+                Sign Up Free
+              </Link>
+            </Button>
           </section>
         </main>
 
@@ -154,7 +195,7 @@ function FeatureCard({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-gray-600 dark:text-gray-300">{description}</p>
+        <p className="text-muted-foreground">{description}</p>
       </CardContent>
     </Card>
   );

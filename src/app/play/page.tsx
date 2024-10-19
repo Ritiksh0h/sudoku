@@ -1,15 +1,6 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { GameBoard } from "@/components/game-board";
 import { GameControls } from "@/components/game-controls";
 import { NumberPad } from "@/components/number-pad";
@@ -19,18 +10,24 @@ import {
   Difficulty,
   boardToString,
   generateSudokuWithMetrics,
-  isSafe,
+  isBoardComplete,
 } from "@/lib/sudoku";
 import { Navbar } from "@/components/Navbar";
 import { Settings } from "@/components/Settings";
 import { Footer } from "@/components/Footer";
+import GameEndDialog from "@/components/game-end";
 
 export default function SudokuGame() {
   const [time, setTime] = useState<number>(0);
   const [isRunning, setIsRunning] = useState<boolean>(true);
-  const [board, setBoard] = useState<Board>(() =>
-    generateSudokuWithMetrics("easy")
-  );
+  const [board, setBoard] = useState<Board>(() => {
+    const { board } = generateSudokuWithMetrics("easy");
+    return board;
+  });
+  const [solution, setSolution] = useState<Board>(() => {
+    const { solution } = generateSudokuWithMetrics("easy");
+    return solution;
+  });
   const [initialBoard, setInitialBoard] = useState<Board>(() =>
     board.map((row) => [...row])
   );
@@ -57,6 +54,73 @@ export default function SudokuGame() {
     setIsClient(true);
   }, []);
 
+  // Memoized handleNumberInput function
+  const handleNumberInput = useCallback(
+    (num: number): void => {
+      if (selectedCell && isRunning && gameStatus === "playing") {
+        const { row, col } = selectedCell;
+        if (initialBoard[row][col] !== 0) return; // Don't allow changing initial numbers
+
+        const newBoard = board.map((r) => [...r]);
+        newBoard[row][col] = num;
+
+        // Only count mistakes if the input is not 0 (deletion) and the number is wrong
+        if (num !== 0 && num !== solution[row][col]) {
+          setMistakes((prev) => {
+            const newMistakes = prev + 1;
+            if (newMistakes >= settings.maxMistakes) {
+              setGameStatus("lost");
+              setIsRunning(false);
+            }
+            return newMistakes;
+          });
+        }
+
+        setBoard(newBoard);
+        setHistory([...history.slice(0, historyIndex + 1), newBoard]);
+        setHistoryIndex(historyIndex + 1);
+
+        if (isBoardComplete(newBoard)) {
+          setGameStatus("won");
+          setIsRunning(false);
+        }
+      }
+    },
+    [
+      selectedCell,
+      isRunning,
+      gameStatus,
+      board,
+      initialBoard,
+      solution,
+      history,
+      historyIndex,
+      settings.maxMistakes,
+    ]
+  );
+
+  // Handle keyboard inputs
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!isRunning || gameStatus !== "playing") return;
+
+      const { key } = event;
+      if (key >= "1" && key <= "9") {
+        event.preventDefault(); // Prevent tab switching
+        handleNumberInput(parseInt(key, 10));
+      } else if (key === "Backspace" || key === "Delete") {
+        event.preventDefault(); // Prevent default browser behavior
+        handleNumberInput(0); // Delete action
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleNumberInput, isRunning, gameStatus]);
+
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (isRunning && settings.displayTimer && gameStatus === "playing") {
@@ -67,63 +131,42 @@ export default function SudokuGame() {
     return () => clearInterval(timer);
   }, [isRunning, settings.displayTimer, gameStatus]);
 
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
-  };
-
   const handleCellClick = (rowIndex: number, colIndex: number): void => {
     if (isRunning && gameStatus === "playing") {
       setSelectedCell({ row: rowIndex, col: colIndex });
     }
   };
 
-  const handleNumberInput = (num: number): void => {
-    if (selectedCell && isRunning && gameStatus === "playing") {
-      const { row, col } = selectedCell;
-      if (initialBoard[row][col] !== 0) return; // Don't allow changing initial numbers
+  // const handleNumberInput = (num: number): void => {
+  //   if (selectedCell && isRunning && gameStatus === "playing") {
+  //     const { row, col } = selectedCell;
+  //     if (initialBoard[row][col] !== 0) return; // Don't allow changing initial numbers
 
-      const newBoard = board.map((r) => [...r]);
-      newBoard[row][col] = num;
+  //     const newBoard = board.map((r) => [...r]);
+  //     newBoard[row][col] = num;
 
-      if (num !== 0 && !isSafe(initialBoard, row, col, num)) {
-        setMistakes((prev) => {
-          const newMistakes = prev + 1;
-          if (newMistakes >= settings.maxMistakes) {
-            setGameStatus("lost");
-            setIsRunning(false);
-          }
-          return newMistakes;
-        });
-      }
+  //     // Only count mistakes if the input is not 0 (deletion) and the number is wrong
+  //     if (num !== 0 && num !== solution[row][col]) {
+  //       setMistakes((prev) => {
+  //         const newMistakes = prev + 1;
+  //         if (newMistakes >= settings.maxMistakes) {
+  //           setGameStatus("lost");
+  //           setIsRunning(false);
+  //         }
+  //         return newMistakes;
+  //       });
+  //     }
 
-      setBoard(newBoard);
-      setHistory([...history.slice(0, historyIndex + 1), newBoard]);
-      setHistoryIndex(historyIndex + 1);
+  //     setBoard(newBoard);
+  //     setHistory([...history.slice(0, historyIndex + 1), newBoard]);
+  //     setHistoryIndex(historyIndex + 1);
 
-      if (isBoardComplete(newBoard)) {
-        setGameStatus("won");
-        setIsRunning(false);
-      }
-    }
-  };
-
-  const isBoardComplete = (board: Board): boolean => {
-    for (let row = 0; row < 9; row++) {
-      for (let col = 0; col < 9; col++) {
-        if (
-          board[row][col] === 0 ||
-          !isSafe(board, row, col, board[row][col])
-        ) {
-          return false;
-        }
-      }
-    }
-    return true;
-  };
+  //     if (isBoardComplete(newBoard)) {
+  //       setGameStatus("won");
+  //       setIsRunning(false);
+  //     }
+  //   }
+  // };
 
   const handleUndo = (): void => {
     if (historyIndex > 0 && isRunning && gameStatus === "playing") {
@@ -144,11 +187,12 @@ export default function SudokuGame() {
   };
 
   const handleNewGame = (): void => {
-    const newBoard = generateSudokuWithMetrics(difficulty);
-    setBoard(newBoard);
-    setInitialBoard(newBoard.map((row) => [...row]));
+    const { board, solution } = generateSudokuWithMetrics(difficulty);
+    setBoard(board);
+    setSolution(solution);
+    setInitialBoard(board.map((row) => [...row]));
     setTime(0);
-    setHistory([newBoard]);
+    setHistory([board]);
     setHistoryIndex(0);
     setIsRunning(true);
     setMistakes(0);
@@ -165,6 +209,19 @@ export default function SudokuGame() {
     setDifficulty(newDifficulty);
     handleNewGame();
   };
+
+  // const handleHint = (): void => {
+  //   if (selectedCell && isRunning && gameStatus === "playing") {
+  //     const { row, col } = selectedCell;
+  //     if (board[row][col] === 0) {
+  //       const newBoard = board.map((r) => [...r]);
+  //       newBoard[row][col] = solution[row][col];
+  //       setBoard(newBoard);
+  //       setHistory([...history.slice(0, historyIndex + 1), newBoard]);
+  //       setHistoryIndex(historyIndex + 1);
+  //     }
+  //   }
+  // };
 
   if (!isClient) {
     return null; // or return a loading indicator
@@ -210,38 +267,23 @@ export default function SudokuGame() {
             onTogglePause={togglePause}
             onUndo={handleUndo}
             onRedo={handleRedo}
+            // onHint={handleHint}
           />
 
           <NumberPad
             isRunning={isRunning}
             gameStatus={gameStatus}
             onNumberInput={handleNumberInput}
+            board={board}
           />
         </div>
 
-        {gameStatus !== "playing" && (
-          <Dialog open={true}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>
-                  {gameStatus === "won" ? "Congratulations!" : "Game Over"}
-                </DialogTitle>
-              </DialogHeader>
-              <div className="text-center">
-                <p>
-                  {gameStatus === "won"
-                    ? "You solved the puzzle!"
-                    : "You reached the maximum number of mistakes."}
-                </p>
-                <p>Time: {formatTime(time)}</p>
-                <p>Difficulty: {difficulty}</p>
-              </div>
-              <DialogFooter>
-                <Button onClick={handleNewGame}>New Game</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        )}
+        <GameEndDialog
+          gameStatus={gameStatus}
+          time={time}
+          difficulty={difficulty}
+          onNewGame={handleNewGame}
+        />
       </div>
       <Footer />
     </>

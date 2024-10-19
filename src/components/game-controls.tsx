@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Pause, Play, Undo2, Redo2, Lightbulb, Pen } from "lucide-react";
+import { Pause, Play, Undo2, Redo2, Pen } from "lucide-react";
 
 interface GameControlsProps {
   isRunning: boolean;
@@ -17,6 +17,7 @@ interface GameControlsProps {
   onTogglePause: () => void;
   onUndo: () => void;
   onRedo: () => void;
+  // onHint: () => void
 }
 
 export function GameControls({
@@ -27,7 +28,8 @@ export function GameControls({
   onTogglePause,
   onUndo,
   onRedo,
-}: GameControlsProps) {
+}: // onHint,
+GameControlsProps) {
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -66,11 +68,14 @@ export function GameControls({
           <Redo2 size={28} />
         </Button>
 
-        <Button
+        {/* <Button
           variant="outline"
           className="relative"
+          onClick={onHint}
           disabled={
-            !isRunning || !settings.limitHints || gameStatus !== "playing"
+            !isRunning ||
+            (settings.limitHints && settings.numberOfHints <= 0) ||
+            gameStatus !== "playing"
           }
         >
           <Lightbulb size={28} />
@@ -79,7 +84,7 @@ export function GameControls({
               {settings.numberOfHints}
             </Badge>
           )}
-        </Button>
+        </Button> */}
 
         <Button
           variant="outline"
