@@ -68,46 +68,76 @@ export default function SudokuGame() {
     setIsClient(true);
   }, []);
 
-  useEffect(() => {
-    const code = searchParams.get("code");
-    if (code) {
-      handleCodeEntered(code);
-    }
-  }, [searchParams]);
-
   const generateGameUrl = (code: string) => {
     const baseUrl = window.location.origin;
     console.log(`${baseUrl}${pathname}?code=${encodeURIComponent(code)}`);
     return `${baseUrl}${pathname}?code=${encodeURIComponent(code)}`;
   };
 
-  const handleCodeEntered = (code: string) => {
-    try {
-      const decodedSudoku = compactStringToSudoku(code);
-      setBoard(decodedSudoku.puzzle);
-      setSolution(decodedSudoku.solution);
-      setHistory([decodedSudoku.puzzle]);
-      setHistoryIndex(0);
-      setDifficulty(decodedSudoku.difficulty);
-      setTime(0);
-      setIsRunning(true);
-      setMistakes(0);
-      setGameStatus("playing");
-      toast({
-        title: "Puzzle Loaded",
-        description: "The Sudoku puzzle has been successfully loaded.",
-      });
-    } catch (error) {
-      console.error("Invalid Sudoku code:", error);
-      toast({
-        title: "Error",
-        description: "Invalid Sudoku code. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
+  // const handleCodeEntered = (code: string) => {
+  //   try {
+  //     const decodedSudoku = compactStringToSudoku(code);
+  //     setBoard(decodedSudoku.puzzle);
+  //     setSolution(decodedSudoku.solution);
+  //     setHistory([decodedSudoku.puzzle]);
+  //     setHistoryIndex(0);
+  //     setDifficulty(decodedSudoku.difficulty);
+  //     setTime(0);
+  //     setIsRunning(true);
+  //     setMistakes(0);
+  //     setGameStatus("playing");
+  //     toast({
+  //       title: "Puzzle Loaded",
+  //       description: "The Sudoku puzzle has been successfully loaded.",
+  //     });
+  //   } catch (error) {
+  //     console.error("Invalid Sudoku code:", error);
+  //     toast({
+  //       title: "Error",
+  //       description: "Invalid Sudoku code. Please try again.",
+  //       variant: "destructive",
+  //     });
+  //   }
+  // };
 
   // Memoized handleNumberInput function
+
+  const handleCodeEntered = useCallback(
+    (code: string) => {
+      try {
+        const decodedSudoku = compactStringToSudoku(code);
+        setBoard(decodedSudoku.puzzle);
+        setSolution(decodedSudoku.solution);
+        setHistory([decodedSudoku.puzzle]);
+        setHistoryIndex(0);
+        setDifficulty(decodedSudoku.difficulty);
+        setTime(0);
+        setIsRunning(true);
+        setMistakes(0);
+        setGameStatus("playing");
+        toast({
+          title: "Puzzle Loaded",
+          description: "The Sudoku puzzle has been successfully loaded.",
+        });
+      } catch (error) {
+        console.error("Invalid Sudoku code:", error);
+        toast({
+          title: "Error",
+          description: "Invalid Sudoku code. Please try again.",
+          variant: "destructive",
+        });
+      }
+    },
+    [toast]
+  );
+
+  useEffect(() => {
+    const code = searchParams.get("code");
+    if (code) {
+      handleCodeEntered(code);
+    }
+  }, [searchParams, handleCodeEntered]);
+
   const handleNumberInput = useCallback(
     (num: number): void => {
       if (selectedCell && isRunning && gameStatus === "playing") {
