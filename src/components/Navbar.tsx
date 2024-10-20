@@ -23,12 +23,10 @@ import {
   PencilLine,
   RotateCcw,
   X,
-  CirclePlus,
 } from "lucide-react";
 import { Settings, SettingsDialog } from "./Settings";
 import ShareSudokuDialog from "./share-dialog";
-import { Difficulty, SudokuData } from "@/lib/sudoku";
-import { sudokuToCompactString } from "@/lib/sudokuEncoder";
+import { Difficulty } from "@/lib/sudoku";
 
 interface NavbarProps {
   difficulty: Difficulty;
@@ -39,23 +37,21 @@ interface NavbarProps {
   onSettingsChange: (newSettings: Settings) => void;
   mistakes: number;
   onCodeEntered: (code: string) => void;
-  sudokuData: SudokuData;
+  shareCode: string;
 }
 
 export function Navbar({
   mistakes,
   onChangeDifficulty,
-  onNewGame,
+  // onNewGame,
   settings,
   onSettingsChange,
   difficulty,
   onRestartGame,
   onCodeEntered,
-  sudokuData,
+  shareCode,
 }: NavbarProps) {
   const [menuOpen, setMenuOpen] = React.useState(false);
-
-  const shareCode = sudokuToCompactString(sudokuData);
 
   return (
     <div className="flex justify-between items-center mb-4 px-4 py-2 bg-muted rounded-lg">
@@ -78,10 +74,6 @@ export function Navbar({
             <DropdownMenuItem onSelect={onRestartGame}>
               <RotateCcw className="mr-1" /> Restart game
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={onNewGame}>
-              <CirclePlus className="mr-1" /> New game
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={(event) => event.preventDefault()}>
               <EnterCodeDialog
                 onCodeEntered={(code) => {

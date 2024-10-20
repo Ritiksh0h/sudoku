@@ -15,9 +15,19 @@ import { Navbar } from "@/components/Navbar";
 import { Settings } from "@/components/Settings";
 import { Footer } from "@/components/Footer";
 import GameEndDialog from "@/components/game-end";
-import { compactStringToSudoku } from "@/lib/sudokuEncoder";
+import {
+  compactStringToSudoku,
+  sudokuToCompactString,
+} from "@/lib/sudokuEncoder";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SudokuGame() {
+  const { toast } = useToast();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [time, setTime] = useState<number>(0);
   const [isRunning, setIsRunning] = useState<boolean>(true);
   const [selectedCell, setSelectedCell] = useState<Cell>(null);
@@ -38,8 +48,6 @@ export default function SudokuGame() {
     highlightConflictingNumbers: true,
     maxMistakes: 3,
   });
-
-  // Memoize the initial board and solution generation
   const {
     board: initialBoard,
     solution: initialSolution,
@@ -60,6 +68,19 @@ export default function SudokuGame() {
     setIsClient(true);
   }, []);
 
+  useEffect(() => {
+    const code = searchParams.get("code");
+    if (code) {
+      handleCodeEntered(code);
+    }
+  }, [searchParams]);
+
+  const generateGameUrl = (code: string) => {
+    const baseUrl = window.location.origin;
+    console.log(`${baseUrl}${pathname}?code=${encodeURIComponent(code)}`);
+    return `${baseUrl}${pathname}?code=${encodeURIComponent(code)}`;
+  };
+
   const handleCodeEntered = (code: string) => {
     try {
       const decodedSudoku = compactStringToSudoku(code);
@@ -72,8 +93,17 @@ export default function SudokuGame() {
       setIsRunning(true);
       setMistakes(0);
       setGameStatus("playing");
+      toast({
+        title: "Puzzle Loaded",
+        description: "The Sudoku puzzle has been successfully loaded.",
+      });
     } catch (error) {
       console.error("Invalid Sudoku code:", error);
+      toast({
+        title: "Error",
+        description: "Invalid Sudoku code. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -106,6 +136,10 @@ export default function SudokuGame() {
         if (isBoardComplete(newBoard)) {
           setGameStatus("won");
           setIsRunning(false);
+          toast({
+            title: "Congratulations!",
+            description: "You've completed the Sudoku puzzle!",
+          });
         }
       }
     },
@@ -119,8 +153,16 @@ export default function SudokuGame() {
       history,
       historyIndex,
       settings.maxMistakes,
+      toast,
     ]
   );
+
+  useEffect(() => {
+    const url = `${pathname}?${searchParams}`;
+    console.log(url);
+    // You can now use the current URL
+    // ...
+  }, [pathname, searchParams]);
 
   // Handle keyboard inputs
   useEffect(() => {
@@ -160,37 +202,6 @@ export default function SudokuGame() {
     }
   };
 
-  // const handleNumberInput = (num: number): void => {
-  //   if (selectedCell && isRunning && gameStatus === "playing") {
-  //     const { row, col } = selectedCell;
-  //     if (initialBoard[row][col] !== 0) return; // Don't allow changing initial numbers
-
-  //     const newBoard = board.map((r) => [...r]);
-  //     newBoard[row][col] = num;
-
-  //     // Only count mistakes if the input is not 0 (deletion) and the number is wrong
-  //     if (num !== 0 && num !== solution[row][col]) {
-  //       setMistakes((prev) => {
-  //         const newMistakes = prev + 1;
-  //         if (newMistakes >= settings.maxMistakes) {
-  //           setGameStatus("lost");
-  //           setIsRunning(false);
-  //         }
-  //         return newMistakes;
-  //       });
-  //     }
-
-  //     setBoard(newBoard);
-  //     setHistory([...history.slice(0, historyIndex + 1), newBoard]);
-  //     setHistoryIndex(historyIndex + 1);
-
-  //     if (isBoardComplete(newBoard)) {
-  //       setGameStatus("won");
-  //       setIsRunning(false);
-  //     }
-  //   }
-  // };
-
   const handleUndo = (): void => {
     if (historyIndex > 0 && isRunning && gameStatus === "playing") {
       setHistoryIndex(historyIndex - 1);
@@ -224,6 +235,13 @@ export default function SudokuGame() {
     if (newDifficulty) {
       setDifficulty(newDifficulty);
     }
+    const newCode = sudokuToCompactString(sudoku);
+    const newUrl = generateGameUrl(newCode);
+    router.push(newUrl);
+    toast({
+      title: "New Game",
+      description: "A new Sudoku puzzle has been generated.",
+    });
   };
 
   const handleRestartGame = (): void => {
@@ -264,7 +282,7 @@ export default function SudokuGame() {
             onSettingsChange={setSettings}
             mistakes={mistakes}
             onCodeEntered={handleCodeEntered}
-            sudokuData={sudoku}
+            shareCode={sudokuToCompactString(sudoku)}
           />
 
           <Card className="shadow-lg">
