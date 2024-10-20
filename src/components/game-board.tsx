@@ -35,27 +35,6 @@ export function GameBoard({
     return borderClass;
   };
 
-  //   const getCellHighlightClass = (rowIndex: number, colIndex: number): string => {
-  //     if (!settings.highlightSameRowColumnBox && !settings.highlightSameNumber) return ""
-
-  //     let highlightClass = ""
-  //     if (selectedCell) {
-  //       const sameRowCol = rowIndex === selectedCell.row || colIndex === selectedCell.col
-  //       const sameBox = Math.floor(rowIndex / 3) === Math.floor(selectedCell.row / 3) &&
-  //                       Math.floor(colIndex / 3) === Math.floor(selectedCell.col / 3)
-  //       const sameNumber = board[rowIndex][colIndex] !== 0 &&
-  //                          board[rowIndex][colIndex] === board[selectedCell.row][selectedCell.col]
-
-  //       if (settings.highlightSameRowColumnBox && (sameRowCol || sameBox)) {
-  //         highlightClass += "bg-primary/20 "
-  //       }
-  //       if (settings.highlightSameNumber && sameNumber) {
-  //         highlightClass += "bg-blue-100 "
-  //       }
-  //     }
-  //     return highlightClass
-  //   }
-
   const getCellErrorClass = (rowIndex: number, colIndex: number): string => {
     if (
       settings.highlightConflictingNumbers &&
@@ -115,7 +94,7 @@ export function GameBoard({
   return (
     <div
       className={`grid grid-cols-9 bg-white ${
-        !isRunning || gameStatus !== "playing" ? "opacity-50" : ""
+        !isRunning || gameStatus !== "playing" ? "opacity-50 text-white" : "text-black"
       }`}
     >
       {board.map((row, rowIndex) =>

@@ -34,13 +34,17 @@ interface ShareSudokuDialogProps {
   shareCode: string;
 }
 
-export default function ShareSudokuDialog({ shareCode }: ShareSudokuDialogProps) {
+export default function ShareSudokuDialog({
+  shareCode,
+}: ShareSudokuDialogProps) {
   const [copied, setCopied] = useState(false);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-  const directPuzzleUrl = `${baseUrl}/play?code=${encodeURIComponent(shareCode)}`;
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const directPuzzleUrl = `${baseUrl}/play?code=${encodeURIComponent(
+    shareCode
+  )}`;
 
   const handleCopy = async () => {
     try {
@@ -48,7 +52,8 @@ export default function ShareSudokuDialog({ shareCode }: ShareSudokuDialogProps)
       setCopied(true);
       toast({
         title: "Link copied",
-        description: "The direct puzzle link has been copied to your clipboard.",
+        description:
+          "The direct puzzle link has been copied to your clipboard.",
       });
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
@@ -58,7 +63,6 @@ export default function ShareSudokuDialog({ shareCode }: ShareSudokuDialogProps)
         variant: "destructive",
       });
       console.log(error);
-
     }
   };
 
@@ -74,7 +78,6 @@ export default function ShareSudokuDialog({ shareCode }: ShareSudokuDialogProps)
         variant: "destructive",
       });
       console.log(error);
-
     }
   };
 
@@ -85,24 +88,42 @@ export default function ShareSudokuDialog({ shareCode }: ShareSudokuDialogProps)
 
     switch (platform) {
       case "twitter":
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(plainMessage)}`, "_blank");
+        window.open(
+          `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+            plainMessage
+          )}`,
+          "_blank"
+        );
         break;
       case "facebook":
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, "_blank");
+        window.open(
+          `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+            shareUrl
+          )}`,
+          "_blank"
+        );
         break;
       case "whatsapp":
-        window.open(`https://wa.me/?text=${encodeURIComponent(plainMessage)}`, "_blank");
+        window.open(
+          `https://wa.me/?text=${encodeURIComponent(plainMessage)}`,
+          "_blank"
+        );
         break;
       case "instagram":
         toast({
           title: "Share on Instagram",
-          description: "Copy this message and share it on Instagram: " + plainMessage,
+          description:
+            "Copy this message and share it on Instagram: " + plainMessage,
         });
         await navigator.clipboard.writeText(plainMessage);
         break;
       case "email":
         // Using HTML for the email body
-        window.location.href = `mailto:?subject=${encodeURIComponent("Check out this Sudoku puzzle!")}&body=${encodeURIComponent(`Check out this Sudoku puzzle! Play it directly here: ${shareUrl}`)}`;
+        window.location.href = `mailto:?subject=${encodeURIComponent(
+          "Check out this Sudoku puzzle!"
+        )}&body=${encodeURIComponent(
+          `Check out this Sudoku puzzle! Play it directly here: ${shareUrl}`
+        )}`;
         break;
       case "sms":
         const smsUrl = navigator.userAgent.match(/iPhone/i)
@@ -121,22 +142,22 @@ export default function ShareSudokuDialog({ shareCode }: ShareSudokuDialogProps)
           } catch (error) {
             toast({
               title: "Sharing failed",
-              description: "Unable to share. Please try copying the link instead.",
+              description:
+                "Unable to share. Please try copying the link instead.",
               variant: "destructive",
             });
             console.log(error);
-
           }
         } else {
           toast({
             title: "Sharing not supported",
-            description: "Your browser doesn't support direct sharing. The link has been copied to your clipboard instead.",
+            description:
+              "Your browser doesn't support direct sharing. The link has been copied to your clipboard instead.",
           });
           handleCopy();
         }
     }
   };
-
 
   return (
     <Dialog>
@@ -144,10 +165,10 @@ export default function ShareSudokuDialog({ shareCode }: ShareSudokuDialogProps)
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <>
                 <Share2 className="cursor-pointer" size={24} />
                 <span className="sr-only">Share Sudoku</span>
-              </Button>
+              </>
             </TooltipTrigger>
             <TooltipContent>
               <p>Share Sudoku</p>

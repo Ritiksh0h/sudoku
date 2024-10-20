@@ -1,5 +1,11 @@
 "use client";
-import React, { useState, useEffect, useCallback, useMemo, Suspense } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  Suspense,
+} from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { GameBoard } from "@/components/game-board";
 import { GameControls } from "@/components/game-controls";
@@ -22,7 +28,7 @@ import {
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
-export default function SudokuGame() {
+function SudokuGame() {
   const { toast } = useToast();
   const router = useRouter();
   const pathname = usePathname();
@@ -73,34 +79,6 @@ export default function SudokuGame() {
     console.log(`${baseUrl}${pathname}?code=${encodeURIComponent(code)}`);
     return `${baseUrl}${pathname}?code=${encodeURIComponent(code)}`;
   };
-
-  // const handleCodeEntered = (code: string) => {
-  //   try {
-  //     const decodedSudoku = compactStringToSudoku(code);
-  //     setBoard(decodedSudoku.puzzle);
-  //     setSolution(decodedSudoku.solution);
-  //     setHistory([decodedSudoku.puzzle]);
-  //     setHistoryIndex(0);
-  //     setDifficulty(decodedSudoku.difficulty);
-  //     setTime(0);
-  //     setIsRunning(true);
-  //     setMistakes(0);
-  //     setGameStatus("playing");
-  //     toast({
-  //       title: "Puzzle Loaded",
-  //       description: "The Sudoku puzzle has been successfully loaded.",
-  //     });
-  //   } catch (error) {
-  //     console.error("Invalid Sudoku code:", error);
-  //     toast({
-  //       title: "Error",
-  //       description: "Invalid Sudoku code. Please try again.",
-  //       variant: "destructive",
-  //     });
-  //   }
-  // };
-
-  // Memoized handleNumberInput function
 
   const handleCodeEntered = useCallback(
     (code: string) => {
@@ -293,7 +271,7 @@ export default function SudokuGame() {
   }
 
   return (
-    <Suspense>
+    <>
       <div className="flex flex-col items-center min-h-screen p-4">
         <div className="w-full max-w-md">
           <Navbar
@@ -355,6 +333,14 @@ export default function SudokuGame() {
         />
       </div>
       <Footer />
+    </>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense>
+      <SudokuGame />
     </Suspense>
   );
 }

@@ -8,10 +8,10 @@ import Link from "next/link";
 
 export default function SudokuTutorial() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 ">
+    <div className="min-h-screen ">
       <div className="container mx-auto px-4 py-12 space-y-12">
         <header className="text-center space-y-4">
-          <h1 className="text-4xl font-bold">Sudoku: Full Tutorial</h1>
+          <h1 className="text-4xl font-bold ">Sudoku: Full Tutorial</h1>
           <p className="text-xl text-muted-foreground">
             Master the art of Sudoku with our comprehensive guide
           </p>
