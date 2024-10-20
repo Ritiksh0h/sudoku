@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, Suspense } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { GameBoard } from "@/components/game-board";
 import { GameControls } from "@/components/game-controls";
@@ -187,13 +187,6 @@ export default function SudokuGame() {
     ]
   );
 
-  useEffect(() => {
-    const url = `${pathname}?${searchParams}`;
-    console.log(url);
-    // You can now use the current URL
-    // ...
-  }, [pathname, searchParams]);
-
   // Handle keyboard inputs
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -300,7 +293,7 @@ export default function SudokuGame() {
   }
 
   return (
-    <>
+    <Suspense>
       <div className="flex flex-col items-center min-h-screen p-4">
         <div className="w-full max-w-md">
           <Navbar
@@ -362,6 +355,6 @@ export default function SudokuGame() {
         />
       </div>
       <Footer />
-    </>
+    </Suspense>
   );
 }
