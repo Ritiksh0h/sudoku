@@ -34,3 +34,10 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Remaining stuffs
+
+- fix numpad glitch in hard. Sometime after selecting open box in board when user tryes to add number nothing happend    
+- add hint button
+- game pause when user open setting or share dialog
+- fix in mobile when user change difficulty 
